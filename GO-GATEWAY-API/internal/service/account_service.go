@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/j-ordep/gateway/go-gateway/internal/domain"
+	"github.com/j-ordep/gateway/go-gateway/internal/dto"
 )
 
 // AccountService implementa a lógica de negócio para contas
@@ -12,6 +13,7 @@ import (
 // 2. Trocar a implementação do repository sem afetar o service
 // 3. Manter o service desacoplado da implementação do repository
 
+
 type AccountService struct {
 	repository domain.AccountRepositoryInterface
 }
@@ -19,7 +21,24 @@ type AccountService struct {
 // NewAccountService é o construtor que recebe a dependência do repository
 // Este é o ponto onde a injeção de dependência acontece no service
 func NewAccountService(repository domain.AccountRepositoryInterface) *AccountService {
-	return &AccountService{
-		repository: repository,
+	return &AccountService{repository: repository,}
+}
+
+func (s *AccountService) CreateAccount(input dto.CreateAccountInput) (*dto.AccountOuput, error) {
+	account := dto.ToAccount(input)
+
+	existingAccount, err := s.repository.FindByAPIKey(account.APIKey)
+	if err != nil && err != domain.ErrAccountNotFound {
+		return nil, err
 	}
+	if existingAccount != nil {
+		return nil, domain.ErrDuplicatedAPIKey
+	}
+	err = s.repository.Save(account)
+	if err != nil {
+		return nil, err
+	}
+
+	output := dto.FromAccount(account)
+	return &output, nil
 }

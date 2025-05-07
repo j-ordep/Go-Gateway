@@ -21,7 +21,7 @@ type AccountOuput struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func ToAccount(input CreateAccountInput) *domain.Account {
+func ToAccount(input CreateAccountInput) *domain.Account { // dto não tem ponteiros, ele transfere os dados e depois jogado fora pelo GC
 	return domain.NewAccount(input.Name, input.Email)
 }
 
