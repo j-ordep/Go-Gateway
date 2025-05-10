@@ -18,8 +18,6 @@ type AccountService struct {
 	repository domain.AccountRepositoryInterface
 }
 
-// NewAccountService é o construtor que recebe a dependência do repository
-// Este é o ponto onde a injeção de dependência acontece no service
 func NewAccountService(repository domain.AccountRepositoryInterface) *AccountService {
 	return &AccountService{repository: repository,}
 }
@@ -39,6 +37,41 @@ func (s *AccountService) CreateAccount(input dto.CreateAccountInput) (*dto.Accou
 		return nil, err
 	}
 
+	output := dto.FromAccount(account)
+	return &output, nil
+}
+
+func (s *AccountService) UpdateBalance(apiKey string, amount float64) (*dto.AccountOuput, error) {
+
+	account, err := s.repository.FindByAPIKey(apiKey)
+	if err != nil {
+		return nil, err
+	}
+	
+	account.AddBalance(amount)
+	err = s.repository.UpdateBalance(account)
+	if err != nil {
+		return nil, err
+	}
+
+	output := dto.FromAccount(account)
+	return &output,nil
+}
+
+func (s *AccountService) FindByAPIKey(apiKey string) (*dto.AccountOuput, error) {
+	account, err := s.repository.FindByAPIKey(apiKey)
+	if err != nil {
+		return nil, err
+	}
+	output := dto.FromAccount(account)
+	return &output, nil
+}
+
+func (s *AccountService) FindById(id string) (*dto.AccountOuput, error) {
+	account, err := s.repository.FindById(id)
+	if err != nil {
+		return nil, err
+	}
 	output := dto.FromAccount(account)
 	return &output, nil
 }

@@ -19,15 +19,13 @@ type AccountRepository struct {
 	db *sql.DB
 }
 
-// NewAccountRepository é o construtor que recebe a dependência
-// Este é o ponto onde a injeção de dependência acontece
+
 func NewAccountRepository(db *sql.DB) *AccountRepository {
 	return &AccountRepository{db: db}
 }
 
 func (repo *AccountRepository) Save(account *domain.Account) error {
 
-	// statment
 	stmt, err := repo.db.Prepare(`
 		INSERT INTO accounts (id, name, email, api_key, balance, create_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)	
@@ -83,7 +81,7 @@ func (repo *AccountRepository) FindByAPIKey(apiKey string) (*domain.Account, err
 
 func (repo *AccountRepository) UpdateBalance(account *domain.Account) error {
 
-	tx, err := repo.db.Begin() // tx = transaction
+	tx, err := repo.db.Begin() 
 	if err != nil {
 		return err
 	}
