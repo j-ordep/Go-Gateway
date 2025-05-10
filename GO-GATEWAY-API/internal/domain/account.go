@@ -39,9 +39,9 @@ func NewAccount(name, email string) *Account {
 	return account
 }
 
-func (a *Account) AddBalance(amount float64) { // vulgo saldo
+func (a *Account) AddBalance(amount float64) {
 	a.mu.Lock() // espera a realização de uma transação para poder realizar outra
-	defer a.mu.Unlock() // lembra do defer em JS, ele espera tudo executar antes de rodar
+	defer a.mu.Unlock()
 	a.Balance += amount
 	a.UpdatedAt = time.Now()
 }
