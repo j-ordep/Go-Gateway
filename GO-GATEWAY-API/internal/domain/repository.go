@@ -1,6 +1,6 @@
 package domain
 
-type AccountRepositoryInterface interface {
+type AccountRepository interface {
 	Save(account *Account) error
 	FindByAPIKey(apiKey string) (*Account, error)
 	FindById(id string) (*Account, error)
