@@ -5,20 +5,11 @@ import (
 	"github.com/j-ordep/gateway/go-gateway/internal/dto"
 )
 
-// AccountService implementa a lógica de negócio para contas
-// Aqui temos um exemplo de Inversão de Dependência, onde o service
-// depende da interface do repository (AccountRepositoryInterface) em vez da implementação concreta.
-// Isso permite:
-// 1. Testar o service sem precisar de um banco de dados real
-// 2. Trocar a implementação do repository sem afetar o service
-// 3. Manter o service desacoplado da implementação do repository
-
-
 type AccountService struct {
-	repository domain.AccountRepositoryInterface
+	repository domain.AccountRepository
 }
 
-func NewAccountService(repository domain.AccountRepositoryInterface) *AccountService {
+func NewAccountService(repository domain.AccountRepository) *AccountService {
 	return &AccountService{repository: repository,}
 }
 
@@ -32,6 +23,7 @@ func (s *AccountService) CreateAccount(input dto.CreateAccountInput) (*dto.Accou
 	if existingAccount != nil {
 		return nil, domain.ErrDuplicatedAPIKey
 	}
+
 	err = s.repository.Save(account)
 	if err != nil {
 		return nil, err

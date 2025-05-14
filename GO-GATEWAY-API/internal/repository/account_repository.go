@@ -7,18 +7,9 @@ import (
 	"github.com/j-ordep/gateway/go-gateway/internal/domain"
 )
 
-// AccountRepository é a implementação concreta da interface AccountRepositoryInterface
-// Aqui temos um exemplo de Injeção de Dependência, onde o AccountRepository
-// recebe sua dependência (db *sql.DB) através do construtor, em vez de criar internamente.
-// Isso permite:
-// 1. Testabilidade (podemos injetar um mock do banco)
-// 2. Flexibilidade (podemos trocar o banco facilmente)
-// 3. Desacoplamento (o repositório não precisa saber como criar a conexão)
-
 type AccountRepository struct {
 	db *sql.DB
 }
-
 
 func NewAccountRepository(db *sql.DB) *AccountRepository {
 	return &AccountRepository{db: db}
@@ -33,9 +24,8 @@ func (repo *AccountRepository) Save(account *domain.Account) error {
 	if err != nil {
 		return err
 	}
-	defer stmt.Close() // defer = eperar tudo rodar ai você executa o Close
+	defer stmt.Close()
 
-	// substitui adicionando os elementos no VALUES da query
 	_, err = stmt.Exec(
 		account.ID,
 		account.Name,
@@ -58,7 +48,7 @@ func (repo *AccountRepository) FindByAPIKey(apiKey string) (*domain.Account, err
 		SELECT id, name, email, api_key, balance, created_at, update_at
 		FROM accounts
 		WHERE api_key = $1
-	`, apiKey).Scan( // $1 é onde vai a apiKey (que entrou como parametro)
+	`, apiKey).Scan(
 		&account.ID,
 		&account.Name,
 		&account.Email,
@@ -86,8 +76,8 @@ func (repo *AccountRepository) UpdateBalance(account *domain.Account) error {
 		return err
 	}
 
-	defer tx.Rollback() // Se algo der errado, desfaz todas as operações
-
+	defer tx.Rollback()
+	
 	var currentBalance float64
 	err = tx.QueryRow(`SELECT balance FROM accounts WHERE id = $1 FOR UPDATE`,
 		account.ID).Scan(&currentBalance)
