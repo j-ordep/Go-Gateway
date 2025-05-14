@@ -18,19 +18,42 @@ func NewAccountHandler(accountService *service.AccountService) *AccountHandler {
 
 func (h *AccountHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var input dto.CreateAccountInput
-	err := json.NewDecoder(r.Body).Decode(&input)
+
+	err := json.NewDecoder(r.Body).Decode(&input) 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	} 
+	}
 
 	output, err := h.accountService.CreateAccount(input)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return  
+		return
+	}
+	
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	
+	json.NewEncoder(w).Encode(output)
+
+}
+
+func (h *AccountHandler) Get(w http.ResponseWriter, r *http.Request) {
+	apiKey := r.Header.Get("X-API-KEY")
+	if apiKey == "" {
+		http.Error(w, "X-API-KEY header is required", http.StatusUnauthorized)
+		return 
+	}
+
+	output, err := h.accountService.FindByAPIKey(apiKey)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
+
 	json.NewEncoder(w).Encode(output)
+	
 }
