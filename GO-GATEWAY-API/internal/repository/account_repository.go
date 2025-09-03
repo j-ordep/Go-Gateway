@@ -38,6 +38,7 @@ func (repo *AccountRepository) Save(account *domain.Account) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -67,6 +68,7 @@ func (repo *AccountRepository) FindByAPIKey(apiKey string) (*domain.Account, err
 
 	account.CreatedAt = createdAt
 	account.UpdatedAt = updatedAt
+
 	return &account, nil
 }
 
@@ -96,6 +98,7 @@ func (repo *AccountRepository) FindById(id string) (*domain.Account, error) {
 
 	account.CreatedAt = createdAt
 	account.UpdatedAt = updatedAt
+	
 	return &account, nil
 }
 
@@ -105,19 +108,18 @@ func (repo *AccountRepository) UpdateBalance(account *domain.Account) error {
 	if err != nil {
 		return err
 	}
-
 	defer tx.Rollback()
 	
 	var currentBalance float64
-	err = tx.QueryRow(`SELECT balance FROM accounts WHERE id = $1 FOR UPDATE`,
-		account.ID).Scan(&currentBalance)
 
+	err = tx.QueryRow(`SELECT balance FROM accounts WHERE id = $1 FOR UPDATE`, account.ID).Scan(&currentBalance)
 	if err == sql.ErrNoRows {
 		return domain.ErrAccountNotFound
 	}
 	if err != nil {
 		return err
 	}
+
 	_, err = tx.Exec(`
 		UPDATE accounts
 		SET balance = $1, update_at = $2
@@ -127,5 +129,4 @@ func (repo *AccountRepository) UpdateBalance(account *domain.Account) error {
 		return err
 	}
 	return tx.Commit()
-
 }
