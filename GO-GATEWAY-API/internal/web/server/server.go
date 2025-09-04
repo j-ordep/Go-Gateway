@@ -24,7 +24,7 @@ func NewServer(accountService *service.AccountService, port string) *Server {
 }
 
 func (s *Server) ConfigureRoutes() {
-	accountHandler := handler.NewAccountHandler(s.accountService) // eu chamo o handler aqui e não na main. POR QUE??
+	accountHandler := handler.NewAccountHandler(s.accountService)
 
 	s.router.Post("/accounts", accountHandler.Create)
 	s.router.Get("/accounts", accountHandler.Get)
