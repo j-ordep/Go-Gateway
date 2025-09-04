@@ -27,7 +27,7 @@ func main() {
 	}
 
 	connStr := fmt.Sprintf(
-		"host=%s port=%s name=%s password=%s dbname=%s sslmode=%s", 
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", 
 		getEnv("DB_HOST", "db"),
 		getEnv("DB_PORT", "5432"),
 		getEnv("DB_USER", "postgres"),
@@ -48,7 +48,7 @@ func main() {
 	port := getEnv("HTTP_PORT", "8080")
 
 	srv := server.NewServer(accountService, port)
-	srv.ConfigureRoutes() 
+	srv.ConfigureRoutes() // handler esta aqui encapsulado
 	if err := srv.Start(); err != nil {
 		log.Fatal("Error starting server: ", err)
 	}
