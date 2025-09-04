@@ -18,7 +18,7 @@ func NewAccountRepository(db *sql.DB) *AccountRepository {
 func (repo *AccountRepository) Save(account *domain.Account) error {
 
 	stmt, err := repo.db.Prepare(`
-		INSERT INTO accounts (id, name, email, api_key, balance, create_at, updated_at)
+		INSERT INTO accounts (id, name, email, api_key, balance, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)	
 	`)
 	if err != nil {
@@ -47,7 +47,7 @@ func (repo *AccountRepository) FindByAPIKey(apiKey string) (*domain.Account, err
 	var createdAt, updatedAt time.Time
 
 	err := repo.db.QueryRow(`
-		SELECT id, name, email, api_key, balance, created_at, update_at
+		SELECT id, name, email, api_key, balance, created_at, updated_at
 		FROM accounts
 		WHERE api_key = $1
 	`, apiKey).Scan(
@@ -122,7 +122,7 @@ func (repo *AccountRepository) UpdateBalance(account *domain.Account) error {
 
 	_, err = tx.Exec(`
 		UPDATE accounts
-		SET balance = $1, update_at = $2
+		SET balance = $1, updated_at = $2
 		WHERE id = $3
 	`, account.Balance, time.Now(), account.ID)
 	if err != nil {
