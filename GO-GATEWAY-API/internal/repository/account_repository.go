@@ -72,36 +72,6 @@ func (repo *AccountRepository) FindByAPIKey(apiKey string) (*domain.Account, err
 	return &account, nil
 }
 
-func (repo *AccountRepository) FindById(id string) (*domain.Account, error) {
-	var account domain.Account
-	var createdAt, updatedAt time.Time
-
-	err := repo.db.QueryRow(`
-		SELECT id, name, email, api_key, balance, created_at, update_at
-		FROM accounts
-		WHERE id = $1
-	`, id).Scan(
-		&account.ID,
-		&account.Name,
-		&account.Email,
-		&account.APIKey,
-		&account.Balance,
-		&createdAt,
-		&updatedAt,
-	)
-	if err == sql.ErrNoRows {
-		return nil, domain.ErrAccountNotFound
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	account.CreatedAt = createdAt
-	account.UpdatedAt = updatedAt
-	
-	return &account, nil
-}
-
 func (repo *AccountRepository) UpdateBalance(account *domain.Account) error {
 
 	tx, err := repo.db.Begin() 
