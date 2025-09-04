@@ -3,7 +3,7 @@
 
 @apiKey = {{createAccount.response.body.api_key}}
 
-### Criar uma nova conta
+### Criar uma nova conta - o post guarda o valor na variavel abaixo (createAccount)
 # @name createAccount
 
 POST {{baseUrl}}/accounts
