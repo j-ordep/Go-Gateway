@@ -12,6 +12,10 @@ var (
 	// ErrInvoiceNotFound é retornado quando uma fatura não é encontrada
 	ErrInvoiceNotFound = errors.New("invoice not found")
 
-	// ErrUnauthorizedAccess é retornado quando há tentativa de acesso não altorizado a um recurso
+	// ErrUnauthorizedAccess é retornado quando há tentativa de acesso não autorizado a um recurso
 	ErrUnauthorizedAccess = errors.New("unauthorized access")
+
+	ErrInvalidAmount = errors.New("Invalid amount")
+
+	ErrInvalidStatus = errors.New("Invalid status")
 )
