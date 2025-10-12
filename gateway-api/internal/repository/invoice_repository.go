@@ -39,17 +39,31 @@ func (r *InvoiceRepository) Save(invoice *domain.Invoice) error {
 }
 
 func (r *InvoiceRepository) FindById(id string) (*domain.Invoice, error) {
-	var invoice *domain.Invoice
+	var invoice domain.Invoice
 
 	query := `
-		SELECT *
+		SELECT id, account_id, amount, status, description, payment_type, card_last_digits, created_at, updated_at
 		FROM invoices
 		WHERE id = $1
 	`
-	r.db.QueryRow(query, id).Scan()
+	err := r.db.QueryRow(query, id).Scan(
+		&invoice.AccountId, 
+		&invoice.Amount, 
+		&invoice.Status, 
+		&invoice.Description, 
+		&invoice.PaymentType, 
+		&invoice.CardLastDigits, 
+		&invoice.CreatedAt, 
+		&invoice.UpdatedAt,
+	)
 
+	if err == sql.ErrNoRows {
+		return nil, domain.ErrInvoiceNotFound
+	}
 
+	if err != nil {
+		return nil, err
+	}
 
-
-	return invoice ,nil
+	return &invoice ,nil
 }
