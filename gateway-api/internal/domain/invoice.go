@@ -58,10 +58,12 @@ func NewInvoice(accountId string, amount float64, description string, paymentTyp
 
 func (i *Invoice) Process() error {
 	if i.Amount > 10000 {
-		return nil
+		return nil // mantem o status como pendente (StatusPending), com isso enviamos o invoice para apache kafka
 	}
 
+	// gera um valor aleatorio, e verifica 
 	randomSource := rand.New(rand.NewSource(time.Now().Unix()))
+
 	var newStatus Status
 
 	if randomSource.Float64() <= 0.7 {
@@ -72,5 +74,13 @@ func (i *Invoice) Process() error {
 
 	i.Status = newStatus
 
+	return nil
+}
+
+func (i *Invoice) UpdateStatus(newStatus Status) error {
+	if i.Status != StatusPending {
+		return ErrInvalidStatus
+	}
+	i.Status = newStatus
 	return nil
 }
