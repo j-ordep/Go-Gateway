@@ -61,7 +61,7 @@ func (i *Invoice) Process() error {
 		return nil // mantem o status como pendente (StatusPending), com isso enviamos o invoice para apache kafka
 	}
 
-	// gera um valor aleatorio, e verifica 
+	// gera um valor numerico aleatorio de 0.0 até 1.0 (ex: 90.12, 0.45, 0.83)
 	randomSource := rand.New(rand.NewSource(time.Now().Unix()))
 
 	var newStatus Status
