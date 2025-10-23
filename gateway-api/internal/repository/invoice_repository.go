@@ -39,13 +39,14 @@ func (r *InvoiceRepository) Save(invoice *domain.Invoice) error {
 }
 
 func (r *InvoiceRepository) FindById(id string) (*domain.Invoice, error) {
-	var invoice domain.Invoice
-
 	query := `
 		SELECT id, account_id, amount, status, description, payment_type, card_last_digits, created_at, updated_at
 		FROM invoices
 		WHERE id = $1
 	`
+
+	var invoice domain.Invoice
+
 	err := r.db.QueryRow(query, id).Scan(
 		&invoice.AccountId, 
 		&invoice.Amount, 
@@ -67,3 +68,42 @@ func (r *InvoiceRepository) FindById(id string) (*domain.Invoice, error) {
 
 	return &invoice ,nil
 }
+
+func (r *InvoiceRepository) FindByAccountId(accountId string) ([]*domain.Invoice, error) {
+	query := `
+		SELECT id, account_id, amount, status, description, payment_type, card_last_digits, created_at, updated_at
+		FROM invoices
+		WHERE account_id = $1
+	`
+	
+	rows, err := r.db.Query(query, accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	var invoices []*domain.Invoice
+	
+	for rows.Next() {
+		var invoice domain.Invoice
+		err := rows.Scan(
+			&invoice.ID,
+			&invoice.AccountId,
+			&invoice.Amount,
+			&invoice.Status,
+			&invoice.Description,
+			&invoice.PaymentType,
+			&invoice.CardLastDigits,
+			&invoice.CreatedAt,
+			&invoice.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		invoices = append(invoices, &invoice)
+	}
+	defer rows.Close()
+
+	return invoices, nil
+}
+
