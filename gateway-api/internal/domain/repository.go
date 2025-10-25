@@ -9,6 +9,6 @@ type AccountRepository interface {
 type InvoiceRepository interface {
 	Save(invoice *Invoice) error
 	FindById(id string) (*Invoice, error)
-	FindByAccountId(id string) ([]*Invoice, error)
-	UpdateStatus(status Status) error
+	FindByAccountId(accountId string) ([]*Invoice, error)
+	UpdateStatus(invoice *Invoice) error
 }
