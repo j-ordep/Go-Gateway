@@ -7,6 +7,10 @@ import (
 	"github.com/google/uuid"
 )
 
+// por que usar Status como um tipo?
+// - type safety (Segurança de tipo)
+// - Centralização dos valores válidos
+// - Facilita validações e refatorações
 type Status string
 
 const (

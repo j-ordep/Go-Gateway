@@ -69,6 +69,7 @@ func (r *InvoiceRepository) FindById(id string) (*domain.Invoice, error) {
 	return &invoice ,nil
 }
 
+// pode retornar varios Invoices, pois varios invoices podem ter o mesmo accountID, (1 account pode ter mais de um invoice)
 func (r *InvoiceRepository) FindByAccountId(accountId string) ([]*domain.Invoice, error) {
 	query := `
 		SELECT id, account_id, amount, status, description, payment_type, card_last_digits, created_at, updated_at
@@ -107,3 +108,27 @@ func (r *InvoiceRepository) FindByAccountId(accountId string) ([]*domain.Invoice
 	return invoices, nil
 }
 
+// unica reponsabilidade do repository é salva no DB, o invoice já vem alterado
+func (r *InvoiceRepository) UpdateStatus(invoice *domain.Invoice) error {
+	query := `
+		UPDATE invoices 
+		SET status = $1, updated_at = $2 
+		WHERE id = $3
+	`
+
+	rows, err := r.db.Exec(query, invoice.Status, invoice.UpdatedAt, invoice.ID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffedted, err := rows.RowsAffected()
+	if err != nil {
+		return err
+	}
+	
+	if rowsAffedted == 0 {
+		return domain.ErrInvoiceNotFound
+	}
+
+	return nil
+}
