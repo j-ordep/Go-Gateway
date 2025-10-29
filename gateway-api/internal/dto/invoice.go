@@ -17,10 +17,12 @@ const (
 )
 
 type CreateInvoiceInput struct {
-	APIKey         string
+	APIKey         string // receber apiKey para buscar a account
 	Amount         float64 `json:"amount"`
 	Description    string  `json:"description"`
 	PaymentType    string  `json:"payment_type"`
+
+	// card
 	CardNumber     string  `json:"card_number"`
 	CVV            string  `json:"cvv"`
 	ExpiryMonth    int     `json:"expiry_mounth"`
@@ -30,7 +32,7 @@ type CreateInvoiceInput struct {
 
 type InvoiceOutput struct {
 	ID             string    `json:"id"`
-	AccountId      string    `json:"account_id"`
+	AccountId      string    `json:"account_id"` // encontrado pela apiKey
 	Amount         float64   `json:"amount"`
 	Status         string    `json:"status"`
 	Description    string    `json:"description"`

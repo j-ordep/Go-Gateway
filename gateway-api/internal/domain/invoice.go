@@ -66,10 +66,13 @@ func (i *Invoice) Process() error {
 	}
 
 	// gera um valor numerico aleatorio de 0.0 até 1.0 (ex: 90.12, 0.45, 0.83)
+	// Isso garante que a cada execução o gerador produza sequências diferentes de números aleatórios.
+	// Se usássemos sempre a mesma semente, os resultados seriam sempre iguais, o que não é desejado para simular aleatoriedade real.
 	randomSource := rand.New(rand.NewSource(time.Now().Unix()))
 
 	var newStatus Status
 
+	// 70% chance de aprovação
 	if randomSource.Float64() <= 0.7 {
 		newStatus = StatusApproved
 	} else {

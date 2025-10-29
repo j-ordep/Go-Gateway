@@ -43,14 +43,19 @@ func (repo *AccountRepository) Save(account *domain.Account) error {
 }
 
 func (repo *AccountRepository) FindByAPIKey(apiKey string) (*domain.Account, error) {
-	var account domain.Account
-	var createdAt, updatedAt time.Time
-
-	err := repo.db.QueryRow(`
+	query := `
 		SELECT id, name, email, api_key, balance, created_at, updated_at
 		FROM accounts
 		WHERE api_key = $1
-	`, apiKey).Scan(
+	`
+
+	// Poderíamos fazer o Scan diretamente em &account.CreatedAt e &account.UpdatedAt,
+	// porém, por segurança e para evitar problemas de tipo caso a struct Account mude (ex: ponteiros, tipos customizados),
+	// utilizamos variáveis intermediárias.
+	var createdAt, updatedAt time.Time
+	var account domain.Account
+
+	err := repo.db.QueryRow(query, apiKey).Scan(
 		&account.ID,
 		&account.Name,
 		&account.Email,

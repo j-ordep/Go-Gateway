@@ -18,6 +18,8 @@ func NewInvoiceService(invoiceRepository domain.InvoiceRepository, accountServic
 }
 
 func (s *InvoiceService) Create(input *dto.CreateInvoiceInput) (*dto.InvoiceOutput, error) {
+	
+	// 1. achar o dono da fatura (accountId)
 	accountOutput, err := s.accountService.FindByAPIKey(input.APIKey)
 	if err != nil {
 		return nil, err
@@ -46,6 +48,10 @@ func (s *InvoiceService) Create(input *dto.CreateInvoiceInput) (*dto.InvoiceOutp
 	invoiceOutput := dto.FromInvoice(invoice)
 
 	return &invoiceOutput, nil
+}
+
+func (s *InvoiceService) FindByAccountId() {
+	
 }
 
 func (s *InvoiceService) UpdateStatus(newStatus domain.Status) {
