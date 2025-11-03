@@ -45,19 +45,58 @@ func (s *InvoiceService) Create(input *dto.CreateInvoiceInput) (*dto.InvoiceOutp
 		return nil, err
 	}
 
-	invoiceOutput := dto.FromInvoice(invoice)
+	return dto.FromInvoice(invoice), nil
 
-	return &invoiceOutput, nil
 }
 
-func (s *InvoiceService) FindByAccountId() {
+func (s *InvoiceService) GetById(id, apiKey string) (*dto.InvoiceOutput, error) {
+	invoice, err := s.invoiceRepository.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	accountOutput, err := s.accountService.FindByAPIKey(apiKey)
+	if err != nil {
+		return nil, err
+	}
 	
+	if invoice.AccountId != accountOutput.ID {
+		return nil, domain.ErrUnauthorizedAccess
+	}
+
+	return dto.FromInvoice(invoice), nil
 }
 
-func (s *InvoiceService) UpdateStatus(newStatus domain.Status) {
+func (s *InvoiceService) ListByAccount(accountId string) ([]*dto.InvoiceOutput, error) {
+	invoices, err := s.invoiceRepository.FindByAccountId(accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	invoiceOutput := make([]*dto.InvoiceOutput, len(invoices))
+	for i, invoice := range invoices {
+		invoiceOutput[i] = dto.FromInvoice(invoice)
+	}
+
+	return invoiceOutput, nil
+}
+
+func (s *InvoiceService) ListByAccountByApiKey(apiKey string) ([]*dto.InvoiceOutput, error) {
+	//50min
+}
+
+func (s *InvoiceService) UpdateStatus(newStatus domain.Status) (*dto.InvoiceOutput, error) {
 	var invoice *domain.Invoice
 
-	invoice.UpdateStatus(newStatus)
+	err := invoice.UpdateStatus(newStatus)
+	if err != nil {
+		return nil, err
+	}
 
-	s.invoiceRepository.UpdateStatus(invoice)
+	err = s.invoiceRepository.UpdateStatus(invoice)
+	if err != nil {
+		return nil, err
+	}
+
+	return dto.FromInvoice(invoice), nil
 }
