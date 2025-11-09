@@ -17,7 +17,7 @@ func NewInvoiceService(invoiceRepository domain.InvoiceRepository, accountServic
 	}
 }
 
-func (s *InvoiceService) Create(input *dto.CreateInvoiceInput) (*dto.InvoiceOutput, error) {
+func (s *InvoiceService) Create(input dto.CreateInvoiceInput) (*dto.InvoiceOutput, error) {
 	
 	// 1. achar o dono da fatura (accountId)
 	accountOutput, err := s.accountService.FindByAPIKey(input.APIKey)
@@ -81,22 +81,11 @@ func (s *InvoiceService) ListByAccount(accountId string) ([]*dto.InvoiceOutput, 
 	return invoiceOutput, nil
 }
 
-func (s *InvoiceService) ListByAccountByApiKey(apiKey string) ([]*dto.InvoiceOutput, error) {
-	//50min
-}
-
-func (s *InvoiceService) UpdateStatus(newStatus domain.Status) (*dto.InvoiceOutput, error) {
-	var invoice *domain.Invoice
-
-	err := invoice.UpdateStatus(newStatus)
+func (s *InvoiceService) ListByAccountApiKey(apiKey string) ([]*dto.InvoiceOutput, error) {
+	accountOutput, err := s.accountService.FindByAPIKey(apiKey)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.invoiceRepository.UpdateStatus(invoice)
-	if err != nil {
-		return nil, err
-	}
-
-	return dto.FromInvoice(invoice), nil
+	return s.ListByAccount(accountOutput.ID)
 }
