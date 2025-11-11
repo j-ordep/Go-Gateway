@@ -42,14 +42,15 @@ func (s *AccountService) FindByAPIKey(apiKey string) (*dto.AccountOuput, error) 
 	return &output, nil
 }
 
+// Balance é atualizado pelo invoice
 func (s *AccountService) UpdateBalance(apiKey string, amount float64) (*dto.AccountOuput, error) {
-
 	account, err := s.repository.FindByAPIKey(apiKey)
 	if err != nil {
 		return nil, err
 	}
 	
 	account.AddBalance(amount)
+
 	err = s.repository.UpdateBalance(account)
 	if err != nil {
 		return nil, err
