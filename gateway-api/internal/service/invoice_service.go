@@ -25,15 +25,18 @@ func (s *InvoiceService) Create(input dto.CreateInvoiceInput) (*dto.InvoiceOutpu
 		return nil, err
 	}
 
+	// 2. tranformar o input (dto - invoice + credit_card) em invoice domain
 	invoice, err := dto.ToInvoice(input, accountOutput.ID)
 	if err != nil {
 		return nil, err
 	}
 
+	// 3. fazer o process do amount(valor $) do invoice
 	if err = invoice.Process(); err != nil {
 		return nil, err
 	}
 
+	// 4. se status é aprovado atualizar o balance da ACCOUNT
 	if invoice.Status == domain.StatusApproved {
 		_, err := s.accountService.UpdateBalance(input.APIKey, invoice.Amount)
 		if err != nil {
@@ -41,10 +44,12 @@ func (s *InvoiceService) Create(input dto.CreateInvoiceInput) (*dto.InvoiceOutpu
 		}
 	}
 
+	// 5. salvar o invoice no banco (tabela de faturas)
 	if err = s.invoiceRepository.Save(invoice); err != nil {
 		return nil, err
 	}
 
+	// 6. devolver como dto
 	return dto.FromInvoice(invoice), nil
 
 }
@@ -67,6 +72,16 @@ func (s *InvoiceService) GetById(id, apiKey string) (*dto.InvoiceOutput, error) 
 	return dto.FromInvoice(invoice), nil
 }
 
+func (s *InvoiceService) ListByAccountApiKey(apiKey string) ([]*dto.InvoiceOutput, error) {
+	accountOutput, err := s.accountService.FindByAPIKey(apiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.ListByAccount(accountOutput.ID)
+}
+
+// func auxiliar para ListByAccountApiKey
 func (s *InvoiceService) ListByAccount(accountId string) ([]*dto.InvoiceOutput, error) {
 	invoices, err := s.invoiceRepository.FindByAccountId(accountId)
 	if err != nil {
@@ -79,13 +94,4 @@ func (s *InvoiceService) ListByAccount(accountId string) ([]*dto.InvoiceOutput, 
 	}
 
 	return invoiceOutput, nil
-}
-
-func (s *InvoiceService) ListByAccountApiKey(apiKey string) ([]*dto.InvoiceOutput, error) {
-	accountOutput, err := s.accountService.FindByAPIKey(apiKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.ListByAccount(accountOutput.ID)
 }

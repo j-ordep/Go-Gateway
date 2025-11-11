@@ -76,7 +76,25 @@ func (h *InvoiceHandler) GetById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *InvoiceHandler) ListByAccount(w http.ResponseWriter, r *http.Request) {
-	h.service.ListByAccount("123")
-}
+	apiKey := r.Header.Get("X-API-KEY")
+	if apiKey == "" {
+		http.Error(w, "X-API-KEY is required", http.StatusUnauthorized)
+		return
+	}
 
-// 1h
+	output, err := h.service.ListByAccountApiKey(apiKey)
+	if err != nil {
+        switch err {
+        case domain.ErrAccountNotFound:
+            http.Error(w, err.Error(), http.StatusUnauthorized)
+            return
+        default:
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+    }
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(output)
+}
