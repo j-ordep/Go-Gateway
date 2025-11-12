@@ -17,6 +17,11 @@ func NewAccountRepository(db *sql.DB) *AccountRepository {
 
 func (repo *AccountRepository) Save(account *domain.Account) error {
 
+    // Prepare: Cria uma query preparada que pode ser executada múltiplas vezes
+    // - Previne SQL Injection (parametrização automática)
+    // - Melhora performance em execuções repetidas (query é compilada uma vez)
+    // - Validação da sintaxe SQL antes da execução
+    // Neste caso, usamos Prepare pois não precisamos de transação ou lock de linha
 	stmt, err := repo.db.Prepare(`
 		INSERT INTO accounts (id, name, email, api_key, balance, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)	
@@ -78,7 +83,11 @@ func (repo *AccountRepository) FindByAPIKey(apiKey string) (*domain.Account, err
 }
 
 func (repo *AccountRepository) UpdateBalance(account *domain.Account) error {
-
+	
+	// 1. FOR UPDATE: Permite fazer lock pessimista na linha (impede leituras/escritas concorrentes)
+    // 2. Atomicidade: Garante que SELECT + UPDATE aconteçam como uma operação única
+    // 3. Isolamento: Previne race condition em atualizações simultâneas de saldo
+    // 4. Consistência: Se algo falhar, Rollback() desfaz todas as alterações
 	tx, err := repo.db.Begin() 
 	if err != nil {
 		return err
