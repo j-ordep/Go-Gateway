@@ -84,100 +84,6 @@ O projeto segue os princípios de **Clean Architecture** com as seguintes camada
 - **Thread Safety**: Mutex para operações de saldo
 - **Validation**: Validação de dados de entrada
 
-## Começando
-
-### Pré-requisitos
-
-- Go 1.24.2 ou superior
-- Banco de dados SQL (PostgreSQL, MySQL, etc.)
-
-### Instalação
-
-1. **Clone o repositório**
-```bash
-git clone https://github.com/j-ordep/Go-Gateway.git
-cd GO-GATEWAY-API
-```
-
-2. **Instale as dependências**
-```bash
-go mod download
-```
-
-3. **Configure o banco de dados**
-```bash
-# Configure suas variáveis de ambiente para conexão com BD
-export DB_HOST=localhost
-export DB_PORT=5432
-export DB_NAME=gateway
-export DB_USER=your_user
-export DB_PASSWORD=your_password
-```
-
-4. **Execute a aplicação**
-```bash
-go run cmd/app/main.go
-```
-
-## API Endpoints
-
-### Accounts
-
-| Método | Endpoint | Descrição | Autenticação |
-|--------|----------|-----------|--------------|
-| `POST` | `/accounts` | Criar nova conta | Não |
-| `GET` | `/accounts` | Buscar conta | API Key |
-
-### Exemplos de Uso
-
-#### Criar Conta
-```bash
-curl -X POST http://localhost:8080/accounts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "João Silva",
-    "email": "joao@email.com"
-  }'
-```
-
-**Resposta:**
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "name": "João Silva",
-  "email": "joao@email.com",
-  "api_key": "a1b2c3d4e5f6g7h8",
-  "balance": 0,
-  "created_at": "2025-08-05T10:30:00Z",
-  "updated_at": "2025-08-05T10:30:00Z"
-}
-```
-
-#### Buscar Conta
-```bash
-curl -X GET http://localhost:8080/accounts \
-  -H "X-API-KEY: a1b2c3d4e5f6g7h8"
-```
-
-## Testes
-
-### Executar Testes
-```bash
-# Todos os testes
-go test ./...
-
-# Testes com cobertura
-go test -cover ./...
-
-# Testes específicos
-go test ./internal/service/
-```
-
-### Estrutura de Testes
-- **Unit Tests**: Testes com mocks para isolamento
-- **Integration Tests**: Testes de fluxo completo
-- **Test Coverage**: Cobertura de código
-
 ## Princípios de Design
 
 ### Clean Architecture
@@ -197,33 +103,14 @@ go test ./internal/service/
 - **Interface Segregation**: Interfaces específicas
 - **Dependency Inversion**: Dependa de abstrações
 
-## Roadmap
+**Variáveis de ambiente**
+```bash
+HTTP_PORT=8080
 
-- [ ] **Authentication System**: Sistema de autenticação JWT
-- [ ] **Payment Processing**: Integração com gateways de pagamento
-- [ ] **Webhook Support**: Suporte a webhooks
-- [ ] **Rate Limiting**: Limitação de requisições
-- [ ] **Logging**: Sistema de logs estruturados
-- [ ] **Monitoring**: Métricas e observabilidade
-- [ ] **Docker Support**: Containerização
-- [ ] **CI/CD Pipeline**: Automação de deploy
-
-## Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## License
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## Autor
-
-**João Pedro** - [@j-ordep](https://github.com/j-ordep)
-
----
-
-**Star este projeto se ele foi útil para você!**
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=gateway
+DB_SSL_MODE=disable
+```
