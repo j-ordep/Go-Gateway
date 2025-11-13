@@ -19,13 +19,14 @@ func NewInvoiceService(invoiceRepository domain.InvoiceRepository, accountServic
 
 func (s *InvoiceService) Create(input dto.CreateInvoiceInput) (*dto.InvoiceOutput, error) {
 	
-	// 1. achar o dono da fatura (accountId)
+	// 1. achar o dono da fatura para obter a accountId que vai no invoice
+	// pegamos a account id atraves da apiKey
 	accountOutput, err := s.accountService.FindByAPIKey(input.APIKey)
 	if err != nil {
 		return nil, err
 	}
 
-	// 2. tranformar o input (dto - invoice + credit_card) em invoice domain
+	// 2. tranformar o input DTO (invoice + credit_card) em invoice domain
 	invoice, err := dto.ToInvoice(input, accountOutput.ID)
 	if err != nil {
 		return nil, err
