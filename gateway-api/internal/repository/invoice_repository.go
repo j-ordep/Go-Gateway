@@ -17,7 +17,7 @@ func NewInvoiceRepository(db *sql.DB) *InvoiceRepository {
 func (r *InvoiceRepository) Save(invoice *domain.Invoice) error {
 	query := `
 		INSERT INTO invoices (id, account_id, amount, status, description, payment_type, card_last_digits, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, &7, $8, $9)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	`
 
 	_, err := r.db.Exec(query, 
@@ -47,7 +47,9 @@ func (r *InvoiceRepository) FindById(id string) (*domain.Invoice, error) {
 
 	var invoice domain.Invoice
 
+	// ...existing code...
 	err := r.db.QueryRow(query, id).Scan(
+		&invoice.ID,
 		&invoice.AccountId, 
 		&invoice.Amount, 
 		&invoice.Status, 

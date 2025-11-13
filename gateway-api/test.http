@@ -9,8 +9,8 @@ POST {{baseUrl}}/accounts
 Content-Type: application/json
 
 {
-    "name": "John",
-    "email": "john@gmail.com"
+    "name": "John4",
+    "email": "john4@gmail.com"
 }
 
 ### Pegar dados da conta
@@ -22,9 +22,10 @@ X-API-KEY: {{apiKey}}
 # @name createInvoice
 POST {{baseUrl}}/invoice
 Content-Type: application/json
+X-API-KEY: {{apiKey}}
 
 {
-    "amount": 100.50,
+    "amount": 100050,
     "description": "Teste de fatura",
     "payment_type": "credit_card",
     "card_number": "4111111111111111",
