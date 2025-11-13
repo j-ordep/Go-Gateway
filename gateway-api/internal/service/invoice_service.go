@@ -78,11 +78,11 @@ func (s *InvoiceService) ListByAccountApiKey(apiKey string) ([]*dto.InvoiceOutpu
 		return nil, err
 	}
 
-	return s.ListByAccount(accountOutput.ID)
+	return s.ListByAccountId(accountOutput.ID)
 }
 
 // func auxiliar para ListByAccountApiKey
-func (s *InvoiceService) ListByAccount(accountId string) ([]*dto.InvoiceOutput, error) {
+func (s *InvoiceService) ListByAccountId(accountId string) ([]*dto.InvoiceOutput, error) {
 	invoices, err := s.invoiceRepository.FindByAccountId(accountId)
 	if err != nil {
 		return nil, err
