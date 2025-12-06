@@ -1,5 +1,5 @@
 ### Variáveis globais
-@baseUrl = http://localhost:8080
+@baseUrl = http://localhost:8081
 
 @apiKey = {{createAccount.response.body.api_key}}
 

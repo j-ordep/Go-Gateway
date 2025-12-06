@@ -18,26 +18,20 @@ func NewInvoiceService(invoiceRepository domain.InvoiceRepository, accountServic
 }
 
 func (s *InvoiceService) Create(input dto.CreateInvoiceInput) (*dto.InvoiceOutput, error) {
-	
-	// 1. achar o dono da fatura para obter a accountId que vai no invoice
-	// pegamos a account id atraves da apiKey
 	accountOutput, err := s.accountService.FindByAPIKey(input.APIKey)
 	if err != nil {
 		return nil, err
 	}
 
-	// 2. tranformar o input DTO (invoice + credit_card) em invoice domain
 	invoice, err := dto.ToInvoice(input, accountOutput.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	// 3. fazer o process do amount(valor $) do invoice
 	if err = invoice.Process(); err != nil {
 		return nil, err
 	}
 
-	// 4. se status é aprovado atualizar o balance da ACCOUNT
 	if invoice.Status == domain.StatusApproved {
 		_, err := s.accountService.UpdateBalance(input.APIKey, invoice.Amount)
 		if err != nil {
@@ -45,12 +39,10 @@ func (s *InvoiceService) Create(input dto.CreateInvoiceInput) (*dto.InvoiceOutpu
 		}
 	}
 
-	// 5. salvar o invoice no banco (tabela de faturas)
 	if err = s.invoiceRepository.Save(invoice); err != nil {
 		return nil, err
 	}
 
-	// 6. devolver como dto
 	return dto.FromInvoice(invoice), nil
 
 }
