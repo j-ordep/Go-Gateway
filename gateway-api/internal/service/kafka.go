@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"log/slog"
 	"os"
 	"strings"
@@ -9,6 +10,22 @@ import (
 	"github.com/j-ordep/gateway/go-gateway/internal/domain/events"
 	"github.com/segmentio/kafka-go"
 )
+
+// Anotação: por que existe `WithTopic`?
+// - Objetivo: criar uma nova `KafkaConfig` mudando apenas o `Topic`, reaproveitando os mesmos `Brokers`.
+// - Imutabilidade: evita mutar a config original; útil quando é compartilhada em múltiplos producers/consumers.
+// - Conveniência: em cenários com um backend servindo vários fluxos (ou vários frontends),
+//   todos usam o mesmo broker, mas publicam/consomem em tópicos diferentes (ex: "pending_transaction",
+//   "transaction_result", "dead_letter"). `WithTopic` facilita compor essas variações.
+// - Legibilidade: deixa explícito que só o tópico muda, reduzindo risco de esquecer campos ao copiar a struct.
+// - Testes: em testes table-driven, gera configs variando apenas `Topic` sem impactar `Brokers`.
+// - Exemplo de uso:
+//     cfg := NewKafkaConfig()                         // Brokers definidos por env ou default
+//     cfgPending := cfg.WithTopic("pending_transaction")
+//     producerPending := NewKafkaProducer(cfgPending) // publica no tópico de pendências
+//     cfgResult := cfg.WithTopic("transaction_result")
+//     consumerResult := NewKafkaConsumer(cfgResult, "group-result", invoiceService)
+//   Assim, reaproveitamos os mesmos brokers, variando somente o tópico para separar responsabilidades.
 
 type KafkaProducerInterface interface {
 	SendingPendingTransaction(ctx context.Context, event events.PendingTransaction) error
@@ -72,7 +89,29 @@ func NewKafkaProducer(config *KafkaConfig) *KafkaProducer {
 	}
 }
 
-func (p *KafkaProducer) SendingPendingTransaction(ctx context.Context, event events.PendingTransaction) error { return nil }
+func (p *KafkaProducer) SendingPendingTransaction(ctx context.Context, event events.PendingTransaction) error {
+	value, err := json.Marshal(event)
+	if err != nil {
+		slog.Error("erro ao converter evento para json", "error", err)
+		return err
+	}
+
+	msg := kafka.Message{
+		Value: value,
+	}
+
+	slog.Info("enviando mensagem para o kafka",
+		"topic", p.topic,
+		"message", string(value))
+
+	if err := p.writer.WriteMessages(ctx, msg); err != nil {
+		slog.Error("erro ao enviar mensagem para o kafka", "error", err)
+		return err
+	}
+
+	slog.Info("mensagem enviada com sucesso para o kafka", "topic", p.topic)
+	return nil
+}
 
 func (s *KafkaProducer) Close() error {
 	slog.Info("fechando conexao com o kafka")
@@ -108,7 +147,7 @@ func NewKafkaConsumer(config *KafkaConfig, groupID string, invoiceService *Invoi
 	}
 }
 
-func (c *KafkaConsumer) Consume(ctx context.Context) error {return nil}
+func (c *KafkaConsumer) Consume(ctx context.Context) error { return nil }
 
 func (c *KafkaConsumer) Close() error {
 	slog.Info("fechando conexao com o kafka consumer")
