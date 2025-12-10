@@ -147,7 +147,39 @@ func NewKafkaConsumer(config *KafkaConfig, groupID string, invoiceService *Invoi
 	}
 }
 
-func (c *KafkaConsumer) Consume(ctx context.Context) error { return nil }
+func (c *KafkaConsumer) Consume(ctx context.Context) error {
+	for {
+		msg, err := c.reader.ReadMessage(ctx)
+		if err != nil {
+			slog.Error("erro ao ler mensagem do kafka", "error", err)
+			return err
+		}
+
+		var result events.TransactionResult
+		if err := json.Unmarshal(msg.Value, &result); err != nil {
+			slog.Error("erro ao converter mensagem para TransactionResult", "error", err)
+			continue
+		}
+
+		slog.Info("mensagem recebida do kafka",
+			"topic", c.topic,
+			"invoice_id", result.InvoiceID,
+			"status", result.Status)
+
+		// Processa o resultado da transação
+		// if err := c.invoiceService.ProcessTransactionResult(result.InvoiceID, result.ToDomainStatus()); err != nil {
+		// 	slog.Error("erro ao processar resultado da transação",
+		// 		"error", err,
+		// 		"invoice_id", result.InvoiceID,
+		// 		"status", result.Status)
+		// 	continue
+		// }
+
+		slog.Info("transação processada com sucesso",
+			"invoice_id", result.InvoiceID,
+			"status", result.Status)
+	}
+}
 
 func (c *KafkaConsumer) Close() error {
 	slog.Info("fechando conexao com o kafka consumer")
