@@ -42,7 +42,6 @@ type KafkaConfig struct {
 	Topic   string
 }
 
-// WithTopic cria uma nova configuração com um tópico diferente
 func (c *KafkaConfig) WithTopic(topic string) *KafkaConfig {
 	return &KafkaConfig{
 		Brokers: c.Brokers,
@@ -58,7 +57,7 @@ func NewKafkaConfig() *KafkaConfig {
 
 	topic := os.Getenv("KAFKA_PRODUCER_TOPIC")
 	if topic == "" {
-		topic = "pending_transaction"
+		topic = "pending_transactions"
 	}
 
 	return &KafkaConfig{

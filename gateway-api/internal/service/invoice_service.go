@@ -39,11 +39,7 @@ func (s *InvoiceService) Create(input dto.CreateInvoiceInput) (*dto.InvoiceOutpu
 
 	if invoice.Status == domain.StatusPending {
 		// Criar e publicar evento de transação pendente
-		pendingTransaction := events.NewPendingTransaction(
-			invoice.AccountID,
-			invoice.ID,
-			invoice.Amount,
-		)
+		pendingTransaction := events.NewPendingTransaction(invoice.AccountID, invoice.ID, invoice.Amount)
 
 		if err := s.kafkaProducer.SendingPendingTransaction(context.Background(), *pendingTransaction); err != nil {
 			return nil, err
