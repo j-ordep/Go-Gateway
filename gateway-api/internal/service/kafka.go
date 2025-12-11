@@ -77,8 +77,10 @@ func NewKafkaProducer(config *KafkaConfig) *KafkaProducer {
 	writer := &kafka.Writer{
 		Addr:     kafka.TCP(config.Brokers...),
 		Topic:    config.Topic,
-		Balancer: &kafka.LeastBytes{},
+		Balancer: &kafka.LeastBytes{}, //envia para a partição com menos bytes enfileirados. Otimiza throughput e reduz filas desbalanceadas sob carga variável.
 	}
+	// &kafka.Hash{}: escolhe partição com base no hash da Key. 
+	// Garante afinidade de partição/ordem por chave (mensagens com mesma Key vão para a mesma partição).
 
 	slog.Info("kafka producer iniciado", "brokers", config.Brokers, "topic", config.Topic)
 
@@ -167,13 +169,13 @@ func (c *KafkaConsumer) Consume(ctx context.Context) error {
 			"status", result.Status)
 
 		// Processa o resultado da transação
-		// if err := c.invoiceService.ProcessTransactionResult(result.InvoiceID, result.ToDomainStatus()); err != nil {
-		// 	slog.Error("erro ao processar resultado da transação",
-		// 		"error", err,
-		// 		"invoice_id", result.InvoiceID,
-		// 		"status", result.Status)
-		// 	continue
-		// }
+		if err := c.invoiceService.ProcessTransactionResult(result.InvoiceID, result.ToDomainStatus()); err != nil {
+			slog.Error("erro ao processar resultado da transação",
+				"error", err,
+				"invoice_id", result.InvoiceID,
+				"status", result.Status)
+			continue
+		}
 
 		slog.Info("transação processada com sucesso",
 			"invoice_id", result.InvoiceID,
