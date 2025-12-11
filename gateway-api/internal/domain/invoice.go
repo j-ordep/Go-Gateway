@@ -21,7 +21,7 @@ const (
 
 type Invoice struct {
 	ID             string
-	AccountId      string
+	AccountID      string
 	Amount         float64
 	Status         Status
 	Description    string
@@ -32,10 +32,10 @@ type Invoice struct {
 }
 
 type CreditCard struct {
-	Number string
-	CVV string
-	ExpiryMonth int
-	ExpiryYear int
+	Number         string
+	CVV            string
+	ExpiryMonth    int
+	ExpiryYear     int
 	CardholderName string
 }
 
@@ -46,17 +46,17 @@ func NewInvoice(accountId string, amount float64, description string, paymentTyp
 
 	// len(card.Number) = 16
 	lastDigits := card.Number[len(card.Number)-4:] // 16 - 4 = [12:] (basicamente ele pega do 12º numero para frente, ou seja ultimos 4 numeros)
-	
+
 	return &Invoice{
-		ID: uuid.New().String(),
-		AccountId: accountId,
-		Amount: amount,
-		Status: StatusPending,
-		Description: description,
-		PaymentType: paymentType,
+		ID:             uuid.New().String(),
+		AccountID:      accountId,
+		Amount:         amount,
+		Status:         StatusPending,
+		Description:    description,
+		PaymentType:    paymentType,
 		CardLastDigits: lastDigits,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}, nil
 }
 
@@ -88,7 +88,7 @@ func (i *Invoice) UpdateStatus(newStatus Status) error {
 	if i.Status != StatusPending {
 		return ErrInvalidStatus
 	}
-	
+
 	i.Status = newStatus
 	i.UpdatedAt = time.Now()
 	return nil

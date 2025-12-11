@@ -13,7 +13,7 @@ func NewAccountService(repository domain.AccountRepository) *AccountService {
 	return &AccountService{repository: repository,}
 }
 
-func (s *AccountService) CreateAccount(input dto.CreateAccountInput) (*dto.AccountOuput, error) {
+func (s *AccountService) CreateAccount(input dto.CreateAccountInput) (*dto.AccountOutput, error) {
 	account := dto.ToAccount(input)
 
 	existingAccount, err := s.repository.FindByAPIKey(account.APIKey)
@@ -33,7 +33,7 @@ func (s *AccountService) CreateAccount(input dto.CreateAccountInput) (*dto.Accou
 	return &output, nil
 }
 
-func (s *AccountService) FindByAPIKey(apiKey string) (*dto.AccountOuput, error) {
+func (s *AccountService) FindByAPIKey(apiKey string) (*dto.AccountOutput, error) {
 	account, err := s.repository.FindByAPIKey(apiKey)
 	if err != nil {
 		return nil, err
@@ -42,8 +42,17 @@ func (s *AccountService) FindByAPIKey(apiKey string) (*dto.AccountOuput, error) 
 	return &output, nil
 }
 
+func (s *AccountService) FindByID(id string) (*dto.AccountOutput, error) {
+	account, err := s.repository.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	output := dto.FromAccount(account)
+	return &output, nil
+}
+
 // Balance é atualizado pelo invoice
-func (s *AccountService) UpdateBalance(apiKey string, amount float64) (*dto.AccountOuput, error) {
+func (s *AccountService) UpdateBalance(apiKey string, amount float64) (*dto.AccountOutput, error) {
 	account, err := s.repository.FindByAPIKey(apiKey)
 	if err != nil {
 		return nil, err

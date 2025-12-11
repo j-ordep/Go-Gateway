@@ -63,7 +63,7 @@ func ToInvoice(input CreateInvoiceInput, accountId string) (*domain.Invoice, err
 func FromInvoice(invoice *domain.Invoice) *InvoiceOutput {
 	return &InvoiceOutput{
 		ID:             invoice.ID,
-		AccountId:      invoice.AccountId,
+		AccountId:      invoice.AccountID,
 		Amount:         invoice.Amount,
 		Status:         string(invoice.Status),
 		Description:    invoice.Description,

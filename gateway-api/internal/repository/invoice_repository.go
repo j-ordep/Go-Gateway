@@ -22,7 +22,7 @@ func (r *InvoiceRepository) Save(invoice *domain.Invoice) error {
 
 	_, err := r.db.Exec(query, 
 		invoice.ID, 
-		invoice.AccountId, 
+		invoice.AccountID, 
 		invoice.Amount, 
 		invoice.Status, 
 		invoice.Description, 
@@ -38,7 +38,7 @@ func (r *InvoiceRepository) Save(invoice *domain.Invoice) error {
 	return nil
 }
 
-func (r *InvoiceRepository) FindById(id string) (*domain.Invoice, error) {
+func (r *InvoiceRepository) FindByID(id string) (*domain.Invoice, error) {
 	query := `
 		SELECT id, account_id, amount, status, description, payment_type, card_last_digits, created_at, updated_at
 		FROM invoices
@@ -50,7 +50,7 @@ func (r *InvoiceRepository) FindById(id string) (*domain.Invoice, error) {
 	// ...existing code...
 	err := r.db.QueryRow(query, id).Scan(
 		&invoice.ID,
-		&invoice.AccountId, 
+		&invoice.AccountID, 
 		&invoice.Amount, 
 		&invoice.Status, 
 		&invoice.Description, 
@@ -72,7 +72,7 @@ func (r *InvoiceRepository) FindById(id string) (*domain.Invoice, error) {
 }
 
 // pode retornar varios Invoices, pois varios invoices podem ter o mesmo accountID, (1 account pode ter mais de um invoice)
-func (r *InvoiceRepository) FindByAccountId(accountId string) ([]*domain.Invoice, error) {
+func (r *InvoiceRepository) FindByAccountID(accountId string) ([]*domain.Invoice, error) {
 	query := `
 		SELECT id, account_id, amount, status, description, payment_type, card_last_digits, created_at, updated_at
 		FROM invoices
@@ -90,7 +90,7 @@ func (r *InvoiceRepository) FindByAccountId(accountId string) ([]*domain.Invoice
 		var invoice domain.Invoice
 		err := rows.Scan(
 			&invoice.ID,
-			&invoice.AccountId,
+			&invoice.AccountID,
 			&invoice.Amount,
 			&invoice.Status,
 			&invoice.Description,

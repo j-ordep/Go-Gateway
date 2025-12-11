@@ -11,7 +11,7 @@ type CreateAccountInput struct {
 	Email string `jason:"email"`
 }
 
-type AccountOuput struct {
+type AccountOutput struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
@@ -25,8 +25,8 @@ func ToAccount(input CreateAccountInput) *domain.Account {
 	return domain.NewAccount(input.Name, input.Email)
 }
 
-func FromAccount(account *domain.Account) AccountOuput {
-	return AccountOuput{
+func FromAccount(account *domain.Account) AccountOutput {
+	return AccountOutput{
 		ID: account.ID,
 		Name: account.Name,
 		Email: account.Email,

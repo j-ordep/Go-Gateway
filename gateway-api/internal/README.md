@@ -8,6 +8,27 @@ Este projeto é um **gateway de pagamentos**, responsável por intermediar trans
 
 ---
 
+## Variáveis de Ambiente
+
+O sistema utiliza as seguintes variáveis de ambiente (ver arquivo `.env` na raiz do projeto):
+
+```
+HTTP_PORT=8081
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=gateway
+DB_SSL_MODE=disable
+
+# Configurações do Kafka
+KAFKA_BROKER=localhost:9092
+KAFKA_PENDING_TRANSACTIONS_TOPIC=pending_transactions
+KAFKA_TRANSACTIONS_RESULT_TOPIC=transactions_result
+KAFKA_CONSUMER_GROUP_ID=gateway-group
+```
+
 ## Entidades Principais
 
 ### Account
