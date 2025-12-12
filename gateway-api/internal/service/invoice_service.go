@@ -18,7 +18,7 @@ func NewInvoiceService(invoiceRepository domain.InvoiceRepository, accountServic
 	return &InvoiceService{
 		invoiceRepository: invoiceRepository,
 		accountService:    accountService,
-		kafkaProducer: kafkaProducer,
+		kafkaProducer:     kafkaProducer,
 	}
 }
 

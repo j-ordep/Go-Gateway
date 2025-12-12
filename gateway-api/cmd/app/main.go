@@ -28,7 +28,7 @@ func main() {
 	}
 
 	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", 
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		getEnv("DB_HOST", "db"),
 		getEnv("DB_PORT", "5432"),
 		getEnv("DB_USER", "postgres"),
@@ -59,28 +59,27 @@ func main() {
 	invoiceRepository := repository.NewInvoiceRepository(db)
 	invoiceService := service.NewInvoiceService(invoiceRepository, *accountService, kafkaProducer)
 
-
-	// Configura e inicializa o consumidor Kafka
-	consumerTopic := getEnv("KAFKA_CONSUMER_TOPIC", "transaction_results")
+	// Ajuste: alinhar com docker-compose.yml e .env
+	// docker-compose cria o tópico 'transactions_result'
+	// README/.env usam KAFKA_TRANSACTIONS_RESULT_TOPIC
+	consumerTopic := getEnv("KAFKA_TRANSACTIONS_RESULT_TOPIC", "transactions_result")
 	consumerConfig := baseKafkaConfig.WithTopic(consumerTopic)
 	groupID := getEnv("KAFKA_CONSUMER_GROUP_ID", "gateway-group")
 
 	kafkaConsumer := service.NewKafkaConsumer(consumerConfig, groupID, invoiceService)
 	defer kafkaConsumer.Close()
 
-	// Inicia o consumidor Kafka em uma goroutine
 	go func() {
 		if err := kafkaConsumer.Consume(context.Background()); err != nil {
 			log.Printf("Error consuming kafka messages: %v", err)
 		}
 	}()
 
-
 	port := getEnv("HTTP_PORT", "8081")
 
 	srv := server.NewServer(accountService, invoiceService, port)
 	srv.ConfigureRoutes() // handler esta aqui encapsulado
-	
+
 	if err := srv.Start(); err != nil {
 		log.Fatal("Error starting server: ", err)
 	}

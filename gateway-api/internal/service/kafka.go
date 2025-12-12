@@ -78,7 +78,7 @@ func NewKafkaProducer(config *KafkaConfig) *KafkaProducer {
 		Topic:    config.Topic,
 		Balancer: &kafka.LeastBytes{}, //envia para a partição com menos bytes enfileirados. Otimiza throughput e reduz filas desbalanceadas sob carga variável.
 	}
-	// &kafka.Hash{}: escolhe partição com base no hash da Key. 
+	// &kafka.Hash{}: escolhe partição com base no hash da Key.
 	// Garante afinidade de partição/ordem por chave (mensagens com mesma Key vão para a mesma partição).
 
 	slog.Info("kafka producer iniciado", "brokers", config.Brokers, "topic", config.Topic)

@@ -92,3 +92,36 @@ KAFKA_CONSUMER_GROUP_ID=gateway-group
 - **Invoice** = Fatura/cobrança gerada para um pagamento.
 - **Processamento** = Simula aprovação automática ou pendência para análise.
 - **Saldo** = Atualizado quando uma cobrança é aprovada.
+
+## Rodando kafka
+
+Producer (dentro do contêiner Kafka, usando listener interno `kafka:29092`):
+
+```
+ docker-compose exec kafka kafka-console-producer --bootstrap-server kafka:29092 --topic transactions_result
+```
+
+Consumer (dentro do contêiner Kafka):
+
+```
+ docker-compose exec kafka kafka-console-consumer --bootstrap-server kafka:29092 --topic transactions_result --group group-result
+```
+
+Se quiser ler desde o início do tópico (apenas se o tópico estiver limpo):
+
+```
+ docker-compose exec kafka kafka-console-consumer --bootstrap-server kafka:29092 --topic transactions_result --group group-result --from-beginning
+```
+
+Alternativa pelo host (WSL/Windows), sem `exec` (listener `localhost:9092`):
+
+```
+ kafka-console-producer --bootstrap-server localhost:9092 --topic transactions_result
+ kafka-console-consumer --bootstrap-server localhost:9092 --topic transactions_result --group group-result
+```
+
+Exemplo de mensagem (uma única linha, sem prefixos `>` ou `#`):
+
+```
+{"invoice_id":"8561acea-bb75-48ee-aa0c-4e5b642de11b","status":"approved"}
+```
