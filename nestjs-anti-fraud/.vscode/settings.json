@@ -1,0 +1,7 @@
+{
+    "symbols.files.associations": {
+        "*.module.ts": "ts",
+        "*.service.ts": "ts"
+    },
+    "prisma.pinToPrisma6": true
+}

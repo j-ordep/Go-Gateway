@@ -59,7 +59,6 @@ func main() {
 	invoiceRepository := repository.NewInvoiceRepository(db)
 	invoiceService := service.NewInvoiceService(invoiceRepository, *accountService, kafkaProducer)
 
-	// Ajuste: alinhar com docker-compose.yml e .env
 	// docker-compose cria o tópico 'transactions_result'
 	// README/.env usam KAFKA_TRANSACTIONS_RESULT_TOPIC
 	consumerTopic := getEnv("KAFKA_TRANSACTIONS_RESULT_TOPIC", "transactions_result")
